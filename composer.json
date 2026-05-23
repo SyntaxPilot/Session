@@ -1,0 +1,22 @@
+{
+    "require": {
+        "php": "^8.1"
+    },
+    "suggest": {
+        "ext-sodium": "Required for encrypted session handlers",
+        "ext-redis": "Required for RedisSessionHandler and RedisLockingSessionHandler",
+        "mongodb/mongodb": "Required for MongoDbSessionHandler",
+        "ext-zlib": "Required for CompressedSessionHandler",
+        "psr/simple-cache": "Useful for cache-backed session integrations"
+    },
+    "autoload": {
+        "psr-4": {
+            "SyntaxPilot\\Session\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SyntaxPilot\\Session\\Tests\\": "tests/"
+        }
+    }
+}
