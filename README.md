@@ -1,1 +1,1 @@
-# Session Kraft
+# Session
