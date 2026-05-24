@@ -1,4 +1,6 @@
 {
+	"name": "syntaxpilot/session",
+	"description": "A fully-featured session management system for PHP.",
     "require": {
         "php": "^8.1"
     },
