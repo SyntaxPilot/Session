@@ -1,6 +1,7 @@
 # Session
 
 [![PHP Composer](https://github.com/SyntaxPilot/Session/actions/workflows/php.yml/badge.svg)](https://github.com/SyntaxPilot/Session/actions/workflows/php.yml)
+[![Coverage Status](https://coveralls.io/repos/github/SyntaxPilot/Session/badge.svg?branch=main)](https://coveralls.io/github/SyntaxPilot/Session?branch=main)
 
 ## Installation
 
