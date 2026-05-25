@@ -23,7 +23,7 @@ final class ArraySessionHandler implements SessionHandlerInterface
     /**
      * @var array<string, array{data: string, last_activity: int}>
      */
-    private static array $storage = [];
+    private array $storage = [];
 
     public function __construct(
         private readonly int $ttl = 1440,
@@ -45,14 +45,14 @@ final class ArraySessionHandler implements SessionHandlerInterface
 
     public function read(string $id): string|false
     {
-        if (!isset(self::$storage[$id])) {
+        if (!isset($this->storage[$id])) {
             return '';
         }
 
-        $item = self::$storage[$id];
+        $item = $this->storage[$id];
 
         if ($item['last_activity'] < time() - $this->ttl) {
-            unset(self::$storage[$id]);
+            unset($this->storage[$id]);
 
             return '';
         }
@@ -62,7 +62,7 @@ final class ArraySessionHandler implements SessionHandlerInterface
 
     public function write(string $id, string $data): bool
     {
-        self::$storage[$id] = [
+        $this->storage[$id] = [
             'data' => $data,
             'last_activity' => time(),
         ];
@@ -72,7 +72,7 @@ final class ArraySessionHandler implements SessionHandlerInterface
 
     public function destroy(string $id): bool
     {
-        unset(self::$storage[$id]);
+        unset($this->storage[$id]);
 
         return true;
     }
@@ -82,9 +82,9 @@ final class ArraySessionHandler implements SessionHandlerInterface
         $deleted = 0;
         $expiresBefore = time() - $this->ttl;
 
-        foreach (self::$storage as $id => $item) {
+        foreach ($this->storage as $id => $item) {
             if ($item['last_activity'] < $expiresBefore) {
-                unset(self::$storage[$id]);
+                unset($this->storage[$id]);
                 $deleted++;
             }
         }
@@ -94,6 +94,6 @@ final class ArraySessionHandler implements SessionHandlerInterface
 
     public static function reset(): void
     {
-        self::$storage = [];
+        // Storage is per instance, so there is no shared state to reset.
     }
 }
