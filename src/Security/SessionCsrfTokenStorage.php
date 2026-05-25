@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2027 Nicholas English
  *
@@ -11,6 +10,7 @@ declare(strict_types=1);
 
 namespace SyntaxPilot\Session\Security;
 
+use SyntaxPilot\Security\Csrf\CsrfTokenPayload;
 use SyntaxPilot\Security\Csrf\CsrfTokenStorageInterface;
 use SyntaxPilot\Session\Contract\SessionStoreInterface;
 
@@ -25,27 +25,27 @@ final class SessionCsrfTokenStorage implements CsrfTokenStorageInterface
     ) {
     }
 
-    public function get(string $id): ?string
+    public function get(string $id): ?CsrfTokenPayload
     {
         $tokens = $this->tokens();
 
-        $token = $tokens[$id] ?? null;
+        $payload = $tokens[$id] ?? null;
 
-        return is_string($token) && $token !== '' ? $token : null;
+        return is_array($payload) ? CsrfTokenPayload::fromArray($payload) : null;
     }
 
-    public function set(string $id, string $token): void
+    public function set(string $id, CsrfTokenPayload $payload): void
     {
         $tokens = $this->tokens();
 
-        $tokens[$id] = $token;
+        $tokens[$id] = $payload->toArray();
 
         $this->session->set($this->key, $tokens);
     }
 
     public function has(string $id): bool
     {
-        return $this->get($id) !== null;
+        return $this->get($id) instanceof CsrfTokenPayload;
     }
 
     public function remove(string $id): void
@@ -62,25 +62,33 @@ final class SessionCsrfTokenStorage implements CsrfTokenStorageInterface
         $this->session->remove($this->key);
     }
 
+    public function prune(): void
+    {
+        $tokens = $this->tokens();
+
+        foreach ($tokens as $id => $payload) {
+            if (!is_array($payload)) {
+                unset($tokens[$id]);
+                continue;
+            }
+
+            $csrfPayload = CsrfTokenPayload::fromArray($payload);
+
+            if (!$csrfPayload instanceof CsrfTokenPayload || $csrfPayload->isExpired()) {
+                unset($tokens[$id]);
+            }
+        }
+
+        $this->session->set($this->key, $tokens);
+    }
+
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     private function tokens(): array
     {
         $tokens = $this->session->get($this->key, []);
 
-        if (!is_array($tokens)) {
-            return [];
-        }
-
-        $valid = [];
-
-        foreach ($tokens as $id => $token) {
-            if (is_string($id) && is_string($token) && $token !== '') {
-                $valid[$id] = $token;
-            }
-        }
-
-        return $valid;
+        return is_array($tokens) ? $tokens : [];
     }
 }
