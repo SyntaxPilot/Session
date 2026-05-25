@@ -32,8 +32,17 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
-    - name: Coveralls
-      uses: coverallsapp/github-action@v2
+    - name: Run PHPUnit with coverage
+      run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
-    - name: Run test suite
-      run: composer run-script test
+    - name: Check coverage file exists
+      run: |
+        ls -la build/logs
+        test -s build/logs/clover.xml
+
+    - name: Upload coverage to Coveralls
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        file: build/logs/clover.xml
+        format: cobertura
