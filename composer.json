@@ -22,7 +22,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "SyntaxPilot\\Tests\\Session": "tests/"
+            "SyntaxPilot\\Tests\\Session\\": "tests/"
         }
     },
 	"scripts": {
